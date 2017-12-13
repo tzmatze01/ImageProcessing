@@ -531,7 +531,7 @@ public class Filter {
 			}
 		}
 
-		System.out.println("size of paths for: "+img.toString()+" is: "paths.size());
+		System.out.println("size of paths for: "+img.toString()+" is: "+paths.size());
 		return paths;
 	}
 

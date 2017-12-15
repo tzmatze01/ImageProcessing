@@ -4,11 +4,6 @@
 // All rights reserved.
 // Date: 2017-08-18
 
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Color;
-
-import java.lang.reflect.Array;
 import java.util.*;
 
 public class Filter {
@@ -26,7 +21,7 @@ public class Filter {
 			0, 0, 0};
 
 	// left						= white 0 - new black 2
-	private static int[][] potraceKernels = new int[][]{{0, 1,
+	private static int[][] potraceKernelsOut = new int[][]{{0, 1,
 			1, 1},
 			// right			= white 3 - new black 1
  			{0, 1,
@@ -37,6 +32,18 @@ public class Filter {
 			// diag - links 	=  white 0 - new Black2
 			{0, 1,
 					1, 0}};
+
+	private static int[][] potraceKernelsIn = new int[][]{{ 1, 0,
+															0, 0},
+															// right			= white 3 - new black 1
+															{1, 0,
+															 1, 1},
+															// straight 		= white 2 - new black 3
+															{1, 0,
+															 1, 0},
+															// diag - links 	=  white 0 - new Black2
+															{1, 0,
+															 0, 1}};
 
 	private static int[] rotCompValues = new int[4];
 	private static int kernelStartPos = 1;
@@ -474,13 +481,14 @@ public class Filter {
 						while (pathIDs.add(tmpPath.getID())) {
 							path.add(tmpPath);
 
+							int nextPixel = (outline) ? tmpPath.getBlackPixel() : tmpPath.getWhitePixel();
+
 							// the next Pixel is the Black Pixel of the returned Path Object
-							tmpPath = getDirection(img, tmpPath.getBlackPixel(), turns, width, outline);
+							tmpPath = getDirection(img, nextPixel, turns, width, outline);
 
 							System.out.println("border between white: " + tmpPath.getWhitePixel() + " and black: " + tmpPath.getBlackPixel() + " matchingkernel: " + tmpPath.getDirection() + " outline: " + tmpPath.isOuterBorder());
 
-							if (Math.abs(turns) == 2)
-								turns = 0;
+							turns = 0;
 
 							// a right turn adds one, a left turn subtracts 1 from turns -> see 'getDirection()' -> 'rotateKernels()'
 							switch (tmpPath.getDirection()) {
@@ -504,7 +512,6 @@ public class Filter {
 						paths.add(new Path(0,0,0));
 
 						resetKernels();
-						kernelStartPos = 1;
 
 						System.out.println("ids " + pathIDs.toString());
 						System.out.println("path completed! added: " + path.toString() + "\n\n");
@@ -541,8 +548,14 @@ public class Filter {
 		// only rotates kernels if turns = -2 / 2 BUT Return values to get correct pixel values with every call
 		if(Math.abs(turns) == 2)
 		{
-			for (int kernel = 0; kernel < potraceKernels.length; ++kernel)
-				potraceKernels[kernel] = rotateKernels(turns, potraceKernels[kernel]);
+			for (int kernel = 0; kernel < potraceKernelsOut.length; ++kernel)
+			{
+				if(outline)
+					potraceKernelsOut[kernel] = rotateKernels(turns, potraceKernelsOut[kernel]);
+				else
+					potraceKernelsIn[kernel] = rotateKernels(turns, potraceKernelsIn[kernel]);
+
+			}
 		}
 
 		rotateKernelStartPos(turns);
@@ -551,7 +564,7 @@ public class Filter {
 
 		boolean match = false;
 
-		for(int kernel = 0; kernel < potraceKernels.length; ++kernel)
+		for(int kernel = 0; kernel < potraceKernelsOut.length; ++kernel)
 		{
 			match = true;
 
@@ -560,7 +573,7 @@ public class Filter {
 			{
 				int pixelPos = startPos + compValues[compValue];
 
-				int kernelBW = potraceKernels[kernel][compValue];
+				int kernelBW = (outline ) ? potraceKernelsOut[kernel][compValue] : potraceKernelsIn[kernel][compValue];
 				int imgBW = 0;
 
 				// if the kernel pos is outside the bounds of the img, the pixel is white
@@ -569,6 +582,7 @@ public class Filter {
 					imgBW = 0xFFFFFFFF;
 				else
 					imgBW = img.argb[pixelPos];
+
 
 				// if kernelValue is 1 -> underlying pixel should be black
 				if (kernelBW == 1 && imgBW == 0xFF000000) {
@@ -635,33 +649,6 @@ public class Filter {
 		return newPath;
 	}
 
-	private static Border getNextBorder(int[] compValues, int kernelNum)
-	{
-		Border nextBorder = Border.OUTER_LEFT;
-
-		// TODO for each kernelstartPos !!!
-
-		switch (kernelNum)
-		{
-			case 0:
-				// for 0: kernel[2] - UP
-				nextBorder.setPixelPos(kernelStartPos + compValues[2]);
-				break;
-			case 1:
-				// same pos - DOWN
-				nextBorder.setPixelPos(kernelStartPos);
-				break;
-			case 2:
-				// [3] - LEFT
-				nextBorder.setPixelPos(kernelStartPos + compValues[3]);
-				break;
-			case 3:
-				// for 3: kernel[2]
-				nextBorder.setPixelPos(kernelStartPos + compValues[2]);
-				break;
-		}
-		return nextBorder;
-	}
 	private static void rotateKernelStartPos(int turns)
 	{
 		// left
@@ -760,7 +747,10 @@ public class Filter {
 
 	private static void resetKernels()
 	{
-		 potraceKernels = new int[][]{{0, 1,
+
+		kernelStartPos = 1;
+
+		potraceKernelsOut = new int[][]{{0, 1,
 				1, 1},
 				// right
 				{0, 1,
@@ -771,6 +761,18 @@ public class Filter {
 				// diag
 				{0, 1,
 						1, 0}};
+
+		potraceKernelsIn = new int[][]{{ 1, 0,
+				0, 0},
+				// right			= white 3 - new black 1
+				{1, 0,
+						1, 1},
+				// straight 		= white 2 - new black 3
+				{1, 0,
+						1, 0},
+				// diag - links 	=  white 0 - new Black2
+				{1, 0,
+						0, 1}};
 	}
 
 

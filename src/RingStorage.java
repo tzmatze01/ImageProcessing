@@ -106,18 +106,27 @@ public class RingStorage<E>
         return (E) this.storage.get(index).getValue();
     }
 
+    public E peekNext()
+    {
+        return (E) currElem.getNext().getValue();
+    }
+
+    public E peekPrevious()
+    {
+        return (E) currElem.getPrevious().getValue();
+    }
     public E getNext()
     {
-        E tmpElem = (E) currElem.getValue();
         currElem = currElem.getNext();
+        E tmpElem = (E) currElem.getValue();
 
         return tmpElem;
     }
 
     public E getPrevious()
     {
-        E tmpElem = (E) currElem.getValue();
         currElem = currElem.getPrevious();
+        E tmpElem = (E) currElem.getValue();
 
         return tmpElem;
     }

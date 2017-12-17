@@ -842,9 +842,11 @@ public class Filter {
 		int[] v_i = null;
 		int[] v_k = null;
 
+		Path next_vi = null;
+
 		// contraints
-		int[] c0 = new int[]{0,0};
-		int[] c1 = new int[]{0,0};
+		int[] c0 = null;
+		int[] c1 = null;
 
 		for(RingStorage<Path> ringPath : ringPaths)
 		{
@@ -859,14 +861,18 @@ public class Filter {
 				Path pivot = currRP.getHead();
 				Path path = null;
 
+				c0 = new int[]{0,0};
+				c1 = new int[]{0,0};
+
 				// init the start point and add to the temporary vector path
-				v_i = new int[]{pivot.getBlackPixel() / imgWidth,
-								pivot.getBlackPixel() % imgWidth};
+				v_i = new int[]{pivot.getBlackPixel() % imgWidth,
+								pivot.getBlackPixel() / imgWidth};
+
+				next_vi = currRP.peekNext();
 
 				tmpVectorPath.add(getCorrectPointOrientation(pivot, imgWidth));
 
 				do {
-					// on the first iteration path and currentHead are the same
 					path = currRP.getNext();
 					directions.add(path.getDirection());
 
@@ -876,50 +882,85 @@ public class Filter {
 
 						path = currRP.getPrevious();
 
-						int[] nextPoint = new int[]{path.getBlackPixel() / imgWidth,
-													path.getBlackPixel() % imgWidth};
+						int[] nextPoint = new int[]{path.getBlackPixel() % imgWidth,
+													path.getBlackPixel() / imgWidth};
 
 						tmpVectorPath.add(getCorrectPointOrientation(path, imgWidth));
 
 						// the new startPoint (v_i) is the current added point
 						v_i = nextPoint;
+
+						next_vi = currRP.peekNext();
+
+						// TODO ???
+						c0 = new int[]{0,0};
+						c1 = new int[]{0,0};
 					}
 					else
 					{
-						v_k = new int[]{path.getBlackPixel() / imgWidth,
-										path.getBlackPixel() % imgWidth};
+						v_k = new int[]{path.getBlackPixel() % imgWidth,
+										path.getBlackPixel() / imgWidth};
 
 						int[] v_ik = new int[]{v_k[0] - v_i[0],
-								v_k[1] - v_i[1]};
+												v_k[1] - v_i[1]};
 
 						// is the vector v_ik inside of bounds
-						if (checkConstraints(c0, c1, v_ik))
+						if (hurtConstraints(c0, c1, v_ik))
 						{
-							// update contraints
-							if (!(Math.abs(v_ik[0]) <= 1) && !(Math.abs(v_ik[1]) <= 1))
-							{
-								c0 = updateC1(c0, v_ik);
-								c1 = updateC1(c1, v_ik);
-							}
-						}
-						else
-						{
-							//System.out.println("hurt constraint");
-							//System.out.println("x: "+point[0]+" y: "+point[1]);
-
-							// get the previous element, because constraints for current are false, and add to tmp path
+							System.out.println("hurt constraint");
 							path = currRP.getPrevious();
 
-							int[] prevPoint = new int[]{path.getBlackPixel() / imgWidth, path.getBlackPixel() % imgWidth};
-
-
+							int[] prevPoint = new int[]{path.getBlackPixel() % imgWidth,
+														path.getBlackPixel() / imgWidth};
 
 							tmpVectorPath.add(getCorrectPointOrientation(path, imgWidth));
 
 							// the new startPoint (v_i) is the current added point
-							//v_i = nextPoint;
-
 							v_i = prevPoint;
+
+							next_vi = currRP.peekNext();
+
+							directions.clear();
+						}
+						// update constraints
+						else if(!(Math.abs(v_ik[0]) <= 1) && !(Math.abs(v_ik[1]) <= 1))
+						{
+							System.out.println("update constraint");
+							c0 = updateC0(c0, v_ik);
+							c1 = updateC1(c1, v_ik);
+						}
+
+						else
+						{
+							System.out.println("prev Path");
+							System.out.println("vi_x: "+v_i[0]+" vi_y: "+v_i[1]+ " x: "+v_ik[0]+" y: "+v_ik[1]);
+
+							// TODO check possible oder straight path
+
+							/* 	v_ik is the possible segment
+								reduce each 'end' of one element
+								-> v_i + 1 & v_k - 1
+
+								if this element is also possible, than v_ik is valid
+							 */
+
+							int[] vi_next = 0;
+							int[] vk_prev = 0;
+
+							int[] next_vik = new int[]{(vk_prev[0] - vi_next[0]),
+														vk_prev[1] - vi_next[1]};
+
+							hurtConstraints(c0, c1, next_vik);
+
+							// get the previous element, because constraints for current are false, and add to tmp path
+							//path = currRP.getPrevious();
+
+
+							//int[] prevPoint = new int[]{path.getBlackPixel() % imgWidth,
+														path.getBlackPixel() / imgWidth};
+
+							//tmpVectorPath.add(getCorrectPointOrientation(path, imgWidth));
+
 
 							c0 = new int[]{0,0};
 							c1 = new int[]{0,0};
@@ -927,7 +968,6 @@ public class Filter {
 							directions.clear();
 						}
 
-					}
 
 				}
 				// stops when the ring iterated to the initial head
@@ -1014,40 +1054,40 @@ public class Filter {
 		// left to right
 		if(black == (white + 1))
 		{
-			nextPoint =  new int[]{path.getBlackPixel() / origImgWidth,
-									path.getBlackPixel() % origImgWidth};
+			nextPoint =  new int[]{path.getBlackPixel() % origImgWidth,
+									path.getBlackPixel() / origImgWidth};
 		}
 		// up to down
 		else if(black == (white + origImgWidth))
 		{
-			nextPoint =  new int[]{path.getBlackPixel() / origImgWidth,
-									path.getBlackPixel() % origImgWidth};
+			nextPoint =  new int[]{path.getBlackPixel() % origImgWidth,
+									path.getBlackPixel() / origImgWidth};
 		}
 		// right to left
 		else if(black == (white - 1))
 		{
-			nextPoint =  new int[]{path.getBlackPixel() / origImgWidth,
-									(path.getBlackPixel() % origImgWidth) + 1};
+			nextPoint =  new int[]{(path.getBlackPixel() % origImgWidth) + 1,
+									path.getBlackPixel() / origImgWidth};
 		}
 		// down to up
 		else if(black == (white - origImgWidth))
 		{
-			nextPoint =  new int[]{(path.getBlackPixel() / origImgWidth) + 1,
-									path.getBlackPixel() % origImgWidth};
+			nextPoint =  new int[]{path.getBlackPixel() % origImgWidth,
+								(path.getBlackPixel() / origImgWidth) +1};
 		}
 
 		return nextPoint;
 	}
 
-	private static boolean checkConstraints(int[] c0, int[] c1, int[] v_ik)
+	private static boolean hurtConstraints(int[] c0, int[] c1, int[] v_ik)
 	{
 		// cross product
 		if((c0[0] * v_ik[1]) - (c0[1] * v_ik[0]) < 0)
-			return false;
-		else if((c1[0] * v_ik[1]) - (c1[1] * v_ik[0]) > 0)
-			return false;
-		else
 			return true;
+		else if((c1[0] * v_ik[1]) - (c1[1] * v_ik[0]) > 0)
+			return true;
+		else
+			return false;
 	}
 
 	private static int[] updateC0(int[] c0, int[] v_ik)

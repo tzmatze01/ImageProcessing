@@ -445,11 +445,11 @@ public class BinarizeViewController {
 				p1 = p2;
 				p2 = point;
 
-				double mP1x = p1[1] * gritSpacingWidth;
-				double mP1y = p1[0] * gritSpacingHeight;
+				double mP1x = p1[0] * gritSpacingWidth;
+				double mP1y = p1[1] * gritSpacingHeight;
 
-				double mP2x = p2[1] * gritSpacingWidth;
-				double mP2y = p2[0] * gritSpacingHeight;
+				double mP2x = p2[0] * gritSpacingWidth;
+				double mP2y = p2[1] * gritSpacingHeight;
 
 				// draw Line
 				gc.setLineWidth(4);
@@ -466,11 +466,11 @@ public class BinarizeViewController {
 			int[] firstPoint = vectorPath.get(0);
 			int[] lastPoint = vectorPath.get(vectorPath.size() - 1);
 
-			double mP1x = firstPoint[1] * gritSpacingWidth;
-			double mP1y = firstPoint[0] * gritSpacingHeight;
+			double mP1x = firstPoint[0] * gritSpacingWidth;
+			double mP1y = firstPoint[1] * gritSpacingHeight;
 
-			double mP2x = lastPoint[1] * gritSpacingWidth;
-			double mP2y = lastPoint[0] * gritSpacingHeight;
+			double mP2x = lastPoint[0] * gritSpacingWidth;
+			double mP2y = lastPoint[1] * gritSpacingHeight;
 
 			// draw Line
 			gc.setLineWidth(4);

@@ -3,6 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="3900a9ff-0b50-4b00-9ee5-2b8a7b152aa1" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change beforePath="$PROJECT_DIR$/out/production/IP4_Daiber/Filter.class" afterPath="$PROJECT_DIR$/out/production/IP4_Daiber/Filter.class" />
+      <change beforePath="$PROJECT_DIR$/src/Filter.java" afterPath="$PROJECT_DIR$/src/Filter.java" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -13,14 +15,14 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.5">
+    <splitter split-orientation="horizontal" split-proportion="0.6855922">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file leaf-file-name="Filter.java" pinned="false" current-in-tab="false">
+          <file leaf-file-name="Filter.java" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/Filter.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="384">
-                  <caret line="927" column="0" lean-forward="false" selection-start-line="927" selection-start-column="0" selection-end-line="927" selection-end-column="0" />
+                <state relative-caret-position="1207">
+                  <caret line="987" column="47" lean-forward="false" selection-start-line="987" selection-start-column="47" selection-end-line="987" selection-end-column="47" />
                   <folding />
                 </state>
               </provider>
@@ -39,17 +41,12 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="RingStorage.java" pinned="false" current-in-tab="true">
+          <file leaf-file-name="RingStorage.java" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/RingStorage.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="376">
-                  <caret line="103" column="38" lean-forward="true" selection-start-line="103" selection-start-column="38" selection-end-line="103" selection-end-column="38" />
-                  <folding>
-                    <element signature="e#2316#2317#0" expanded="true" />
-                    <element signature="e#2372#2373#0" expanded="true" />
-                    <element signature="e#2407#2408#0" expanded="true" />
-                    <element signature="e#2467#2468#0" expanded="true" />
-                  </folding>
+                <state relative-caret-position="370">
+                  <caret line="103" column="10" lean-forward="false" selection-start-line="103" selection-start-column="10" selection-end-line="103" selection-end-column="10" />
+                  <folding />
                 </state>
               </provider>
             </entry>
@@ -347,7 +344,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="49363000" />
+    <option name="totallyTimeSpent" value="50172000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1680" height="1050" extended-state="0" />
@@ -440,14 +437,6 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/Filter.java</url>
-          <line>909</line>
-          <properties />
-          <option name="timeStamp" value="17" />
-        </line-breakpoint>
-      </breakpoints>
       <option name="time" value="18" />
     </breakpoint-manager>
     <watches-manager />
@@ -811,8 +800,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Filter.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="384">
-          <caret line="927" column="0" lean-forward="false" selection-start-line="927" selection-start-column="0" selection-end-line="927" selection-end-column="0" />
+        <state relative-caret-position="1207">
+          <caret line="987" column="47" lean-forward="false" selection-start-line="987" selection-start-column="47" selection-end-line="987" selection-end-column="47" />
           <folding />
         </state>
       </provider>
@@ -838,14 +827,9 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/RingStorage.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="376">
-          <caret line="103" column="38" lean-forward="true" selection-start-line="103" selection-start-column="38" selection-end-line="103" selection-end-column="38" />
-          <folding>
-            <element signature="e#2316#2317#0" expanded="true" />
-            <element signature="e#2372#2373#0" expanded="true" />
-            <element signature="e#2407#2408#0" expanded="true" />
-            <element signature="e#2467#2468#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="370">
+          <caret line="103" column="10" lean-forward="false" selection-start-line="103" selection-start-column="10" selection-end-line="103" selection-end-column="10" />
+          <folding />
         </state>
       </provider>
     </entry>

@@ -854,6 +854,7 @@ public class Filter {
 			Path initialHead = ringPath.getHead();
 
 			do {
+				int direction = 0;
 				Set<Integer> directions = new HashSet<>();
 				RingStorage<Path> currRP = new RingStorage<>(ringPath); // TODO geht auch ohne das?
 				List<int[]> tmpVectorPath = new LinkedList<>();
@@ -874,10 +875,13 @@ public class Filter {
 
 				do {
 					path = currRP.getNext();
-					directions.add(path.getDirection());
+					//directions.add(path.getDirection());
+					if(path.getDirection() != 2)
+						++direction;
 
-					// TODO directions with kernelnumbers can be faults -> count how many 0 & 2 & 3 ?
-					if(directions.size() > 3)
+					if(direction > 3)
+					// TODO directions with kernelnumbers can be faulty -> count how many 0 & 2 & 3 ?
+					//if(directions.size() > 3)
 					{
 						directions.clear();
 
@@ -895,6 +899,8 @@ public class Filter {
 
 						c0 = new int[]{0,0};
 						c1 = new int[]{0,0};
+
+						direction = 0;
 					}
 					else {
 						v_k = new int[]{path.getBlackPixel() % imgWidth,
@@ -905,10 +911,6 @@ public class Filter {
 
 						// is the vector v_ik inside of bounds
 						if (hurtConstraints(c0, c1, v_ik)) {
-
-
-							System.out.println("hurt constraint");
-
 
 							path = currRP.getPrevious();
 
@@ -928,17 +930,18 @@ public class Filter {
 
 							directions.clear();
 
+							direction = 0;
 						}
 						// update constraints
 						else if (!(Math.abs(v_ik[0]) <= 1) && !(Math.abs(v_ik[1]) <= 1))
 						{
-							System.out.println("update constraint");
+							//System.out.println("update constraint");
 							c0 = updateC0(c0, v_ik);
 							c1 = updateC1(c1, v_ik);
 						}
 						else {
-							System.out.println("prev Path");
-							System.out.println("vi_x: " + v_i[0] + " vi_y: " + v_i[1] + " x: " + v_ik[0] + " y: " + v_ik[1]);
+							//System.out.println("prev Path");
+							//System.out.println("vi_x: " + v_i[0] + " vi_y: " + v_i[1] + " x: " + v_ik[0] + " y: " + v_ik[1]);
 
 
 							/* 	v_ik is the possible segment
@@ -981,6 +984,8 @@ public class Filter {
 								c1 = new int[]{0, 0};
 
 								directions.clear();
+
+								direction = 0; 
 							}
 
 							// get the previous element, because constraints for current are false, and add to tmp path

@@ -460,6 +460,7 @@ public class BinarizeViewController {
 				gc.setLineWidth(8);
 				gc.setStroke(Color.GREY);
 				gc.strokeLine(mP2x, mP2y, mP2x, mP2y);
+
 			}
 
 			int[] firstPoint = vectorPath.get(0);

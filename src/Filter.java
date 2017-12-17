@@ -863,7 +863,7 @@ public class Filter {
 				v_i = new int[]{pivot.getBlackPixel() / imgWidth,
 								pivot.getBlackPixel() % imgWidth};
 
-				tmpVectorPath.add(v_i);
+				tmpVectorPath.add(getCorrectPointOrientation(pivot, imgWidth));
 
 				do {
 					// on the first iteration path and currentHead are the same
@@ -879,7 +879,7 @@ public class Filter {
 						int[] nextPoint = new int[]{path.getBlackPixel() / imgWidth,
 													path.getBlackPixel() % imgWidth};
 
-						tmpVectorPath.add(nextPoint);
+						tmpVectorPath.add(getCorrectPointOrientation(path, imgWidth));
 
 						// the new startPoint (v_i) is the current added point
 						v_i = nextPoint;
@@ -910,12 +910,11 @@ public class Filter {
 							// get the previous element, because constraints for current are false, and add to tmp path
 							path = currRP.getPrevious();
 
-							int[] prevPoint = new int[]{path.getBlackPixel() / imgWidth,
-														path.getBlackPixel() % imgWidth};
+							int[] prevPoint = new int[]{path.getBlackPixel() / imgWidth, path.getBlackPixel() % imgWidth};
 
 
 
-							tmpVectorPath.add(prevPoint);
+							tmpVectorPath.add(getCorrectPointOrientation(path, imgWidth));
 
 							// the new startPoint (v_i) is the current added point
 							//v_i = nextPoint;
@@ -1004,6 +1003,40 @@ public class Filter {
 		System.out.println("\n\n: ");
 		*/
 		return vectorPaths;
+	}
+	private static int[] getCorrectPointOrientation(Path path, int origImgWidth)
+	{
+		int[] nextPoint = new int[2];
+
+		int black = path.getBlackPixel();
+		int white = path.getWhitePixel();
+
+		// left to right
+		if(black == (white + 1))
+		{
+			nextPoint =  new int[]{path.getBlackPixel() / origImgWidth,
+									path.getBlackPixel() % origImgWidth};
+		}
+		// up to down
+		else if(black == (white + origImgWidth))
+		{
+			nextPoint =  new int[]{path.getBlackPixel() / origImgWidth,
+									path.getBlackPixel() % origImgWidth};
+		}
+		// right to left
+		else if(black == (white - 1))
+		{
+			nextPoint =  new int[]{path.getBlackPixel() / origImgWidth,
+									(path.getBlackPixel() % origImgWidth) + 1};
+		}
+		// down to up
+		else if(black == (white - origImgWidth))
+		{
+			nextPoint =  new int[]{(path.getBlackPixel() / origImgWidth) + 1,
+									path.getBlackPixel() % origImgWidth};
+		}
+
+		return nextPoint;
 	}
 
 	private static boolean checkConstraints(int[] c0, int[] c1, int[] v_ik)

@@ -101,7 +101,7 @@ public class RingStorage<E>
     public E getHead()
     {
         currElem = this.storage.get(index);
-        currElem = currElem.getNext();
+        //currElem = currElem.getNext();
 
         return (E) this.storage.get(index).getValue();
     }

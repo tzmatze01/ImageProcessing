@@ -876,6 +876,7 @@ public class Filter {
 					path = currRP.getNext();
 					directions.add(path.getDirection());
 
+					// TODO directions with kernelnumbers can be faults -> count how many 0 & 2 & 3 ?
 					if(directions.size() > 3)
 					{
 						directions.clear();
@@ -892,26 +893,27 @@ public class Filter {
 
 						next_vi = currRP.peekNext();
 
-						// TODO ???
 						c0 = new int[]{0,0};
 						c1 = new int[]{0,0};
 					}
-					else
-					{
+					else {
 						v_k = new int[]{path.getBlackPixel() % imgWidth,
-										path.getBlackPixel() / imgWidth};
+								path.getBlackPixel() / imgWidth};
 
 						int[] v_ik = new int[]{v_k[0] - v_i[0],
-												v_k[1] - v_i[1]};
+								v_k[1] - v_i[1]};
 
 						// is the vector v_ik inside of bounds
-						if (hurtConstraints(c0, c1, v_ik))
-						{
+						if (hurtConstraints(c0, c1, v_ik)) {
+
+
 							System.out.println("hurt constraint");
+
+
 							path = currRP.getPrevious();
 
 							int[] prevPoint = new int[]{path.getBlackPixel() % imgWidth,
-														path.getBlackPixel() / imgWidth};
+									path.getBlackPixel() / imgWidth};
 
 							tmpVectorPath.add(getCorrectPointOrientation(path, imgWidth));
 
@@ -920,22 +922,24 @@ public class Filter {
 
 							next_vi = currRP.peekNext();
 
+
+							c0 = new int[]{0,0};
+							c1 = new int[]{0,0};
+
 							directions.clear();
+
 						}
 						// update constraints
-						else if(!(Math.abs(v_ik[0]) <= 1) && !(Math.abs(v_ik[1]) <= 1))
+						else if (!(Math.abs(v_ik[0]) <= 1) && !(Math.abs(v_ik[1]) <= 1))
 						{
 							System.out.println("update constraint");
 							c0 = updateC0(c0, v_ik);
 							c1 = updateC1(c1, v_ik);
 						}
-
-						else
-						{
+						else {
 							System.out.println("prev Path");
-							System.out.println("vi_x: "+v_i[0]+" vi_y: "+v_i[1]+ " x: "+v_ik[0]+" y: "+v_ik[1]);
+							System.out.println("vi_x: " + v_i[0] + " vi_y: " + v_i[1] + " x: " + v_ik[0] + " y: " + v_ik[1]);
 
-							// TODO check possible oder straight path
 
 							/* 	v_ik is the possible segment
 								reduce each 'end' of one element
@@ -944,31 +948,52 @@ public class Filter {
 								if this element is also possible, than v_ik is valid
 							 */
 
-							int[] vi_next = 0;
-							int[] vk_prev = 0;
+							int[] vi_next = new int[]{next_vi.getBlackPixel() % imgWidth,
+									next_vi.getBlackPixel() / imgWidth};
+
+							int[] vk_prev = new int[]{currRP.peekPrevious().getBlackPixel() % imgWidth,
+									currRP.peekPrevious().getBlackPixel() / imgWidth};
+
+							// continue if the subpath is only one or two elements long, because therefore no 'real' vk_prev can exist
+							if(vk_prev[0] == v_i[0] && vk_prev[1] == v_i[1] || vi_next[0] == vk_prev[0] && vi_next[1] == vk_prev[1])
+							{
+								continue;
+							}
 
 							int[] next_vik = new int[]{(vk_prev[0] - vi_next[0]),
-														vk_prev[1] - vi_next[1]};
+									vk_prev[1] - vi_next[1]};
 
-							hurtConstraints(c0, c1, next_vik);
+
+							// when the constraints are not hurt, v_ik is also possible and the subpath can be incremented -> next path in storage
+							if (hurtConstraints(c0, c1, next_vik)) {
+
+								path = currRP.getPrevious();
+
+								System.out.println("adds: "+path.toString());
+
+								tmpVectorPath.add(getCorrectPointOrientation(path, imgWidth));
+
+								v_i = new int[]{path.getBlackPixel() % imgWidth, path.getBlackPixel() / imgWidth};
+
+								next_vi = currRP.peekNext();
+
+								c0 = new int[]{0, 0};
+								c1 = new int[]{0, 0};
+
+								directions.clear();
+							}
 
 							// get the previous element, because constraints for current are false, and add to tmp path
 							//path = currRP.getPrevious();
 
 
-							//int[] prevPoint = new int[]{path.getBlackPixel() % imgWidth,
-														path.getBlackPixel() / imgWidth};
+							//int[] prevPoint = new int[]{path.getBlackPixel() % imgWidth, path.getBlackPixel() / imgWidth};
 
 							//tmpVectorPath.add(getCorrectPointOrientation(path, imgWidth));
 
 
-							c0 = new int[]{0,0};
-							c1 = new int[]{0,0};
-
-							directions.clear();
 						}
-
-
+					}
 				}
 				// stops when the ring iterated to the initial head
 				while(!pivot.getID().matches(path.getID()));

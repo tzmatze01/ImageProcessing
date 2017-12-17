@@ -108,16 +108,16 @@ public class RingStorage<E>
 
     public E getNext()
     {
-        E tmpElem = (E) currElem.getValue();
         currElem = currElem.getNext();
+        E tmpElem = (E) currElem.getValue();
 
         return tmpElem;
     }
 
     public E getPrevious()
     {
-        E tmpElem = (E) currElem.getValue();
         currElem = currElem.getPrevious();
+        E tmpElem = (E) currElem.getValue();
 
         return tmpElem;
     }

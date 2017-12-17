@@ -45,6 +45,7 @@ public class Filter {
 															{1, 0,
 															 0, 1}};
 
+	private static Set<String> pathsIDs = null;
 	private static int[] rotCompValues = new int[4];
 	private static int kernelStartPos = 1;
 	private static int horizontalStep = 0; // gets set in potrace()
@@ -439,7 +440,7 @@ public class Filter {
 
 		// data structure to store vertexes / outlines of objects
 		List<Path> paths = new LinkedList<>();
-		Set<String> pathsIDs = new HashSet<>();
+		pathsIDs = new HashSet<>();
 
 		for (int height = 0; height < img.height; ++height) {
 
@@ -455,12 +456,7 @@ public class Filter {
 						img.argb[pos] == 0xFF000000 &&
 						img.argb[pos - 1] == 0xFFFFFFFF)
 				{
-					// TODO check if outline then reverse
-
-
-					System.out.println("pos: "+pos);
-
-					Set<Path> path = new LinkedHashSet<>();
+					List<Path> path = new LinkedList<>();
 					Set<String> pathIDs = new HashSet<>();
 
 					Path tmpPath = new Path(0,0,0);
@@ -473,7 +469,6 @@ public class Filter {
 					// this border is not in another path
 					if(!pathsIDs.contains(tmpPath.getID())) {
 
-						//System.out.println(""+tmpPath.getBlackPixel()+ " w: "+tmpPath.getWhitePixel());
 						// see getDirection()
 						int turns = 0;
 
@@ -481,10 +476,8 @@ public class Filter {
 						while (pathIDs.add(tmpPath.getID())) {
 							path.add(tmpPath);
 
-							int nextPixel = (outline) ? tmpPath.getBlackPixel() : tmpPath.getWhitePixel();
-
 							// the next Pixel is the Black Pixel of the returned Path Object
-							tmpPath = getDirection(img, nextPixel, turns, width, outline);
+							tmpPath = getDirection(img,  tmpPath.getBlackPixel(), turns, width, outline);
 
 							System.out.println("border between white: " + tmpPath.getWhitePixel() + " and black: " + tmpPath.getBlackPixel() + " matchingkernel: " + tmpPath.getDirection() + " outline: " + tmpPath.isOuterBorder());
 
@@ -492,13 +485,26 @@ public class Filter {
 
 							// a right turn adds one, a left turn subtracts 1 from turns -> see 'getDirection()' -> 'rotateKernels()'
 							switch (tmpPath.getDirection()) {
-								case 3:
+								//case 3:
 								case 0:
-									turns += 2;
+									turns = 1;
 									break;
 								case 1:
-									turns -= 2;
+									turns = -1;
 									break;
+								case 3:
+									if(outline)
+										turns = 1;
+									else
+									{
+										// if the last border has the same white pixel as the new border, the kernels only need to be turned once
+										if(tmpPath.getWhitePixel() == path.get(path.size()-1).getWhitePixel())
+											turns = 1;
+										else
+											turns = -1;
+									}
+									break;
+
 								default:
 									// straight
 									break;
@@ -513,8 +519,8 @@ public class Filter {
 
 						resetKernels();
 
-						System.out.println("ids " + pathIDs.toString());
-						System.out.println("path completed! added: " + path.toString() + "\n\n");
+						//System.out.println("ids " + pathIDs.toString());
+						//System.out.println("path completed! added: " + path.toString() + "\n\n");
 					}
 				}
 				// if this occurs, toggle the value of outline if this position isn't already a border
@@ -545,20 +551,19 @@ public class Filter {
 	private static Path getDirection(RasterImage img, int startPos, int turns, int currImgWidth, boolean outline)
 	{
 
-		// only rotates kernels if turns = -2 / 2 BUT Return values to get correct pixel values with every call
-		if(Math.abs(turns) == 2)
+		int rotations = Math.abs(turns);
+
+		// only rotates kernels if turns != 0 BUT Return values to get correct pixel values with every call
+		for(; rotations > 0; --rotations)
 		{
 			for (int kernel = 0; kernel < potraceKernelsOut.length; ++kernel)
 			{
-				if(outline)
-					potraceKernelsOut[kernel] = rotateKernels(turns, potraceKernelsOut[kernel]);
-				else
-					potraceKernelsIn[kernel] = rotateKernels(turns, potraceKernelsIn[kernel]);
-
+				potraceKernelsOut[kernel] = rotateKernels(turns, potraceKernelsOut[kernel]);
 			}
+
+			rotateKernelStartPos(turns);
 		}
 
-		rotateKernelStartPos(turns);
 
 		int[] compValues = getCompValues();
 
@@ -573,7 +578,7 @@ public class Filter {
 			{
 				int pixelPos = startPos + compValues[compValue];
 
-				int kernelBW = (outline ) ? potraceKernelsOut[kernel][compValue] : potraceKernelsIn[kernel][compValue];
+				int kernelBW = potraceKernelsOut[kernel][compValue];
 				int imgBW = 0;
 
 				// if the kernel pos is outside the bounds of the img, the pixel is white
@@ -631,8 +636,8 @@ public class Filter {
 
 		switch (kernelNum)
 		{
+			//case 3:
 			case 0:
-			case 3:
 				newPath.setBlackPixel(kernelStartPos + compValues[2]);
 				newPath.setWhitePixel(kernelStartPos + compValues[0]);
 				break;
@@ -644,6 +649,33 @@ public class Filter {
 				newPath.setBlackPixel(kernelStartPos + compValues[3]);
 				newPath.setWhitePixel(kernelStartPos + compValues[2]);
 				break;
+
+			case 3:
+				if(outline)
+				{
+					newPath.setBlackPixel(kernelStartPos + compValues[2]);
+					newPath.setWhitePixel(kernelStartPos + compValues[0]);
+				}
+				else
+				{
+					// if current path is an inline, check if 'opposite' border is already registered wit its ID
+					int bP = kernelStartPos + compValues[2];
+					int wP = kernelStartPos + compValues[3];
+
+					Path testPath = new Path(bP, wP, 0);
+
+					if(pathsIDs.contains(testPath.getID()))
+					{
+						newPath.setBlackPixel(kernelStartPos + compValues[2]);
+						newPath.setWhitePixel(kernelStartPos + compValues[0]);
+					}
+					else
+					{
+						newPath.setBlackPixel(kernelStartPos + compValues[1]);
+						newPath.setWhitePixel(wP);
+					}
+				}
+				break;
 		}
 
 		return newPath;
@@ -652,7 +684,7 @@ public class Filter {
 	private static void rotateKernelStartPos(int turns)
 	{
 		// left
-		if(turns == -2)
+		if(turns < 0)
 		{
 			switch (kernelStartPos)
 			{
@@ -670,7 +702,7 @@ public class Filter {
 					break;
 			}
 		}
-		else if(turns == 2)
+		else if(turns > 0)
 		{
 			switch (kernelStartPos)
 			{
@@ -696,7 +728,7 @@ public class Filter {
 			int[] copyKernel = Arrays.copyOf(kernel, kernel.length);
 
 			// turn left
-			if(turns == -2)
+			if(turns < 0)
 			{
 				//System.out.println("rotate left");
 				kernel[0] = copyKernel[1];
@@ -705,7 +737,7 @@ public class Filter {
 				kernel[3] = copyKernel[2];
 			}
 			// turn right
-			else if(turns == 2)
+			else if(turns > 0)
 			{
 				//System.out.println("rotate right");
 				kernel[0] = copyKernel[2];
@@ -803,6 +835,8 @@ public class Filter {
 		}
 
 		List<List<int[]>> vectorPaths = new LinkedList<>();
+
+		System.out.println("size of paths: "+ringPaths.size());
 
 		// path vectors
 		int[] v_i = null;
@@ -923,6 +957,7 @@ public class Filter {
 
 
 
+			/*
 			System.out.println("length possible vector pahts: "+tmpVectorPaths.size());
 
 				for(List<int[]> path : tmpVectorPaths)
@@ -936,6 +971,7 @@ public class Filter {
 
 
 			System.out.println("\n\n: ");
+			*/
 
 			int size = 0;
 			List<int[]> lowPoly = new LinkedList<>();
@@ -954,6 +990,7 @@ public class Filter {
 			vectorPaths.add(lowPoly);
 		}
 
+		/*
 		System.out.println("paths: ");
 		for(List<int[]> path : vectorPaths)
 		{
@@ -965,7 +1002,7 @@ public class Filter {
 
 
 		System.out.println("\n\n: ");
-
+		*/
 		return vectorPaths;
 	}
 

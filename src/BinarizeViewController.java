@@ -35,7 +35,8 @@ public class BinarizeViewController {
 		ISODATA("ISO Data"),
 		FLOODFILLING("Flood Filling"),
 		BORDER("Border"),
-		VECTOR("Vector");
+		VECTOR("Vector"),
+		BEZIER("Bezier Curves");
 		
 		private final String name;       
 	    MethodeType(String s) { name = s; }
@@ -80,6 +81,9 @@ public class BinarizeViewController {
 
 	@FXML
 	private Canvas vectorCanvas;
+
+	@FXML
+	private Canvas bezierCanvas;
 
     @FXML
     private ImageView originalImageView;
@@ -270,6 +274,13 @@ public class BinarizeViewController {
 					vectorPaths = Filter.vectorisation(paths, origImgWidth);
 				}
 				drawVectorPaths();
+				break;
+			case BEZIER:
+				if(paths.isEmpty() || vectorPaths.isEmpty()) {
+					paths = Filter.potrace(binImg);
+					vectorPaths = Filter.vectorisation(paths, origImgWidth);
+				}
+				drawBezierCurves();
 				break;
 			default:
 				break;
@@ -478,6 +489,30 @@ public class BinarizeViewController {
 			gc.strokeLine(mP1x, mP1y, mP2x, mP2y);
 		}
 
+	}
+
+	private void drawBezierCurves()
+	{
+		if(vectorPaths.isEmpty())
+			return; // no vector paths: nothing to do
+
+		if(origImgHeight == 0 || origImgWidth == 0)
+		{
+			origImgHeight = (int) binarizedImageView.getImage().getHeight();
+			origImgWidth = (int) binarizedImageView.getImage().getWidth();
+		}
+
+		double zoomedWidth = Math.ceil(zoom * origImgWidth);
+		double zoomedHeight = Math.ceil(zoom * origImgHeight);
+
+		bezierCanvas.setWidth(zoomedWidth);
+		bezierCanvas.setHeight(zoomedHeight);
+
+		GraphicsContext gc = bezierCanvas.getGraphicsContext2D();
+		gc.clearRect(0, 0, zoomedWidth, zoomedHeight);
+
+		double gritSpacingWidth = binarizedImageView.getImage().getWidth() / origImgWidth;
+		double gritSpacingHeight = binarizedImageView.getImage().getHeight() / origImgHeight;
 	}
 
 }

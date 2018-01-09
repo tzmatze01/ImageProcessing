@@ -73,6 +73,7 @@
                            <Canvas fx:id="overlayCanvas"/>
                            <Canvas fx:id="pathCanvas"/>
                            <Canvas fx:id="vectorCanvas"/>
+                           <Canvas fx:id="bezierCanvas"/>
                      </StackPane>
                   </ScrollPane>
                </content>

@@ -160,4 +160,9 @@ public class RingStorage<E>
 
         return content;
     }
+
+    public int size()
+    {
+        return storage.size();
+    }
 }

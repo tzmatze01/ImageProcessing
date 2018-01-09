@@ -873,13 +873,14 @@ public class Filter {
 
 				tmpVectorPath.add(getCorrectPointOrientation(pivot, imgWidth));
 
+
 				do {
 					path = currRP.getNext();
-					//directions.add(path.getDirection());
+
 					if(path.getDirection() != 2)
 						++direction;
 
-					if(direction > 3)
+					else if(direction > 3)
 					// TODO directions with kernelnumbers can be faulty -> count how many 0 & 2 & 3 ?
 					//if(directions.size() > 3)
 					{

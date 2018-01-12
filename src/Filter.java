@@ -848,13 +848,13 @@ public class Filter {
 
 		for(RingStorage<Path> ringPath : ringPaths)
 		{
-			List<List<int[]>> tmpVectorPaths = new LinkedList<>();
+			List<List<int[]>> tmpVectorPaths = new ArrayList<>();
 			Path initialHead = ringPath.getHead();
 
 			do {
 				Set<Integer> directions = new HashSet<>();
 				RingStorage<Path> currRP = new RingStorage<>(ringPath); // TODO geht auch ohne das?
-				List<int[]> tmpVectorPath = new LinkedList<>();
+				List<int[]> tmpVectorPath = new ArrayList<>();
 
 				Path pivot = currRP.getHead();
 				Path path = null;
@@ -862,6 +862,7 @@ public class Filter {
 				// init the start point and add to the temporary vector path
 				v_i = new int[]{pivot.getBlackPixel() / imgWidth,
 								pivot.getBlackPixel() % imgWidth};
+
 
 				tmpVectorPath.add(getCorrectPointOrientation(pivot, imgWidth));
 
@@ -1011,29 +1012,36 @@ public class Filter {
 		int black = path.getBlackPixel();
 		int white = path.getWhitePixel();
 
+		// every  point in vector path has third element to indicate an inline=0 or outline=1
+		int outline = (path.isOuterBorder()) ? 1 : 0;
+
 		// left to right
 		if(black == (white + 1))
 		{
 			nextPoint =  new int[]{path.getBlackPixel() / origImgWidth,
-									path.getBlackPixel() % origImgWidth};
+									path.getBlackPixel() % origImgWidth,
+									outline};
 		}
 		// up to down
 		else if(black == (white + origImgWidth))
 		{
 			nextPoint =  new int[]{path.getBlackPixel() / origImgWidth,
-									path.getBlackPixel() % origImgWidth};
+									path.getBlackPixel() % origImgWidth,
+									outline};
 		}
 		// right to left
 		else if(black == (white - 1))
 		{
 			nextPoint =  new int[]{path.getBlackPixel() / origImgWidth,
-									(path.getBlackPixel() % origImgWidth) + 1};
+									(path.getBlackPixel() % origImgWidth) + 1,
+									outline};
 		}
 		// down to up
 		else if(black == (white - origImgWidth))
 		{
 			nextPoint =  new int[]{(path.getBlackPixel() / origImgWidth) + 1,
-									path.getBlackPixel() % origImgWidth};
+									path.getBlackPixel() % origImgWidth,
+									outline};
 		}
 
 		return nextPoint;

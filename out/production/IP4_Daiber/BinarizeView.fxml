@@ -28,19 +28,49 @@
 <?import javafx.scene.canvas.Canvas?>
 <BorderPane maxHeight="800.0" maxWidth="1200.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="BinarizeViewController">
    <top>
-      <VBox>
-         <HBox alignment="TOP_CENTER">
+      <HBox>
+         <VBox alignment="TOP_CENTER">
             <Label text="Zoom: " />
             <Slider fx:id="zoomSlider" max="50.0" min="1.0" />
-         </HBox>
-         <HBox alignment="TOP_CENTER">
+         </VBox>
+
+         <VBox alignment="TOP_CENTER">
             <Label text="Grid: " />
             <CheckBox fx:id="gridCheckbox" />
 
             <Label text="Border: " />
             <CheckBox fx:id="borderCheckbox" />
-         </HBox>
-      </VBox>
+         </VBox>
+         <VBox alignment="TOP_CENTER">
+            <Label text="Bezier Sliders: " />
+
+            <HBox>
+               <Label text="a min: " />
+               <Slider fx:id="aMinSlider" max="1.0" min="0.1" />
+               <Label fx:id="aMinLabel"/>
+            </HBox>
+
+            <HBox>
+               <Label text="a max: " />
+               <Slider fx:id="aMaxSlider" max="4.0" min="1.0" />
+               <Label fx:id="aMaxLabel"/>
+            </HBox>
+
+            <HBox>
+               <Label text="factor: " />
+               <Slider fx:id="factor" max="2.0" min="0.5" />
+               <Label fx:id="factorLabel"/>
+            </HBox>
+
+         </VBox>
+
+         <VBox>
+            <CheckBox fx:id="fillCurves" text="Fill Curves"/>
+            <CheckBox fx:id="showImage" text="Show Image"/>
+            <Button fx:id="reset" text="Rest Values"/>
+         </VBox>
+
+      </HBox>
    </top>
    <center>
       <GridPane hgap="5.0" vgap="5.0" BorderPane.alignment="CENTER">
@@ -69,24 +99,24 @@
                <content>
                   <ScrollPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" pannable="true">
                      <StackPane fx:id="stack2">
-                           <ImageView fx:id="binarizedImageView" pickOnBounds="true" preserveRatio="true" smooth="false" />
-                           <Canvas fx:id="overlayCanvas"/>
-                           <Canvas fx:id="pathCanvas"/>
-                           <Canvas fx:id="vectorCanvas"/>
+                        <ImageView fx:id="binarizedImageView" pickOnBounds="true" preserveRatio="true" smooth="false" />
+                        <Canvas fx:id="overlayCanvas"/>
+                        <Canvas fx:id="pathCanvas"/>
+                        <Canvas fx:id="vectorCanvas"/>
                      </StackPane>
                   </ScrollPane>
                </content>
             </TitledPane>
             <Button mnemonicParsing="false" onAction="#openImage" text="Open Image" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" />
             <GridPane hgap="5.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
-              <columnConstraints>
+               <columnConstraints>
                   <ColumnConstraints minWidth="10.0" />
-                <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
-              </columnConstraints>
-              <rowConstraints>
+                  <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
+               </columnConstraints>
+               <rowConstraints>
                   <RowConstraints minHeight="27.0" vgrow="SOMETIMES" />
                   <RowConstraints minHeight="27.0" vgrow="SOMETIMES" />
-              </rowConstraints>
+               </rowConstraints>
                <children>
                   <VBox>
                      <HBox>

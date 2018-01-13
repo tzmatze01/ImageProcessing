@@ -144,6 +144,12 @@ public class BinarizeViewController {
 	private Button reset;
 
 	@FXML
+	private CheckBox showPath;
+
+
+
+
+	@FXML
 	public void initialize() {
 
 		// set combo boxes items
@@ -256,7 +262,10 @@ public class BinarizeViewController {
 		showImage.selectedProperty().addListener(new ChangeListener<Boolean>() {
 			@Override
 			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-				zoomChanged();
+				if(showImage.isSelected())
+					binarizedImageView.setVisible(true);
+				else
+					binarizedImageView.setVisible(false);
 			}
 		});
 
@@ -276,6 +285,14 @@ public class BinarizeViewController {
 
 				factor.setValue(4/3);
 				factorLabel.setText("1.33");
+			}
+		});
+
+		showPath.selectedProperty().setValue(true);
+		showPath.selectedProperty().addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+				drawPath();
 			}
 		});
 	}
@@ -449,16 +466,21 @@ public class BinarizeViewController {
 
 	private void drawPath() {
 
-		if (paths.isEmpty())
+
+		double zoomedWidth = Math.ceil(zoom * origImgWidth);
+		double zoomedHeight = Math.ceil(zoom * origImgHeight);
+
+		if (paths.isEmpty() || !showPath.isSelected())
+		{
+			pathCanvas.getGraphicsContext2D().clearRect(0,0,zoomedWidth, zoomedHeight);
 			return; // no paths: nothing to do
+		}
 
 		if (origImgHeight == 0 || origImgWidth == 0) {
 			origImgHeight = (int) binarizedImageView.getImage().getHeight();
 			origImgWidth = (int) binarizedImageView.getImage().getWidth();
 		}
 
-		double zoomedWidth = Math.ceil(zoom * origImgWidth);
-		double zoomedHeight = Math.ceil(zoom * origImgHeight);
 
 		pathCanvas.setWidth(zoomedWidth);
 		pathCanvas.setHeight(zoomedHeight);
@@ -599,6 +621,7 @@ public class BinarizeViewController {
 
 				double alpha = factorValue * (distance - 0.5) / distance;
 
+				/*
 				if(alpha < aMinValue)
 				{
 					alpha = aMinValue;
@@ -619,6 +642,12 @@ public class BinarizeViewController {
 					gc.setStroke(Color.GREEN);
 					gc.stroke();
 				}
+				*/
+
+				gc.bezierCurveTo(firstMidPoints[0], firstMidPoints[1], mP1x, mP1y, secondMidPoints[0], secondMidPoints[1]);
+				gc.setLineWidth(4);
+				gc.setStroke(Color.GREEN);
+				gc.stroke();
 
 				// Curve Points
 				gc.setLineWidth(8);

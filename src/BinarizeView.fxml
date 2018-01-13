@@ -29,7 +29,12 @@
 <BorderPane maxHeight="800.0" maxWidth="1200.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="BinarizeViewController">
    <top>
       <HBox>
+         <padding>
+            <Insets top="10" left="10" bottom="10" right="10"/>
+         </padding>
+
          <VBox alignment="TOP_CENTER">
+
             <Label text="Zoom: " />
             <Slider fx:id="zoomSlider" max="50.0" min="1.0" />
          </VBox>
@@ -41,6 +46,7 @@
             <Label text="Border: " />
             <CheckBox fx:id="borderCheckbox" />
          </VBox>
+
          <VBox alignment="TOP_CENTER">
             <Label text="Bezier Sliders: " />
 
@@ -64,8 +70,9 @@
 
          </VBox>
 
-         <VBox>
+         <VBox alignment="TOP_CENTER">
             <CheckBox fx:id="fillCurves" text="Fill Curves"/>
+            <CheckBox fx:id="showPath" text="Show Path"/>
             <CheckBox fx:id="showImage" text="Show Image"/>
             <Button fx:id="reset" text="Rest Values"/>
          </VBox>
